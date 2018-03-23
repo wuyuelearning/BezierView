@@ -9,11 +9,11 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 /**
+ *
+ * 基准线两端固定，中间点的为控制点
+ *
  * Created by admin on 2018/3/22.
  */
 
@@ -134,7 +134,7 @@ public class BezierView extends View {
                 Log.d("TAG", "move");
                 Log.d("TAG", "( " + event.getX() + " , " + event.getY() + " )");
                 ensureControlPoint(event);
-                invalidate();
+                invalidate();                       // 刷新
                 break;
             case MotionEvent.ACTION_UP:
                 Log.d("TAG", "up");
@@ -144,7 +144,7 @@ public class BezierView extends View {
                 break;
         }
 //        return super.onTouchEvent(event);
-        return true;
+        return true;      //  返回值需要改为true
     }
 
     /**
