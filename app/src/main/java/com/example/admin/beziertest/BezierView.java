@@ -81,7 +81,7 @@ public class BezierView extends View {
         initControlPointX = viewWidth / 2;
         initControlPointY = viewHeight / 3;
 
-        viewStartX = baseLineStartX;
+        viewStartX =   baseLineStartX;
         viewStartY = 0;
         viewEndX = baseLineEndX;
         viewEndY = viewHeight;
