@@ -2,11 +2,9 @@ package com.example.admin.beziertest;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.support.annotation.Nullable;
-import android.support.v7.view.menu.MenuAdapter;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -18,27 +16,29 @@ import android.view.View;
 
 public class BezierView2 extends View {
 
-    Point startPoint1;
+    Point startPoint1; //曲线1
     Point endPoint1;
 
-    Point endPoint2;
+    Point endPoint2;  //  曲线2
     Point startPoint2;
     
-    // 
-    Point middlePoint1;
+
+    Point middlePoint1;  //  控制点
     Point middlePoint2;
 
-    Circle fixedCircle;
-    Circle touchCircle;
+    Circle fixedCircle; // 固定原位的圆
+    Circle touchCircle; //  随点击事件移动的圆
 
     Paint paint;
     Paint paintCircle;
     Path path;
 
-    float initEndX;
+    float initEndX;   //  固定原位的圆的圆心初始位置 ， 移动圆弹回的位置
     float initEndY;
+    
+    float maxDiatance;  // 固定圆与移动圆之间相距的最大距离 ，超出距离 固定圆和曲线消失
 
-    boolean isShowFixedCircle = true;
+    boolean isShowFixedCircle = true;  // 是否显示固定圆
     boolean onceDisppeared = false; // 用于判断 小圆是否消失 ，使得 如果消失过 当大圆再回到20r的范围内 小圆不再出现
 
     public BezierView2(Context context) {
@@ -70,7 +70,6 @@ public class BezierView2 extends View {
         path.quadTo(middlePoint2.x, middlePoint2.y, endPoint2.x, endPoint2.y);
         path.lineTo(endPoint2.x, endPoint2.y);
 
-
         //  小圆消失后 贝塞尔曲线也消失
         if (isShowFixedCircle) {
             canvas.drawPath(path, paint);
@@ -78,7 +77,6 @@ public class BezierView2 extends View {
         }
 
         canvas.drawCircle(touchCircle.x, touchCircle.y, touchCircle.r, paintCircle);    //    动圆
-
 
     }
 
@@ -104,6 +102,8 @@ public class BezierView2 extends View {
 
         fixedCircle.r = 20;
         touchCircle.r = 30;
+
+        maxDiatance = 20* fixedCircle.r;
         
         ensureBezierPoint();
         ensureMiddlePoint();
@@ -133,15 +133,13 @@ public class BezierView2 extends View {
             case MotionEvent.ACTION_UP:
                 motionUp();
                 break;
-
         }
-        return true;
+        return true;   //  需要返回true
     }
 
     private void motionMove(float tempX, float tempY) {
-
-        //  如果 点击位置未超出大圆的范围，则大圆圆心为点击点的坐标
-        if (pointRange(touchCircle.x, touchCircle.y, tempX, tempY, touchCircle.r)) {
+        //  如果 点击位置未超出大圆的范围，则大圆圆心跟随移动  否则大圆不动
+        if (isBeyondCircle(touchCircle.x, touchCircle.y, tempX, tempY, touchCircle.r)) {
             touchCircle.x = tempX;
             touchCircle.y = tempY;
         } else {
@@ -155,8 +153,8 @@ public class BezierView2 extends View {
         } else {
             isShowFixedCircle = true;
         }
-        // 如果 两个圆之间的距离大于小圆的三倍则小圆消失
-        if (distanceCircle(touchCircle.x, touchCircle.y) > 20 * fixedCircle.r) {
+
+        if (getDistance(touchCircle.x, touchCircle.y) > maxDiatance) {
             isShowFixedCircle = false;
             onceDisppeared = true;
         }
@@ -165,6 +163,7 @@ public class BezierView2 extends View {
 
     private void motionUp() {
         //isShowFixedCircle = false;
+        //  抬起点击点  大圆退回原位
         touchCircle.x = initEndX;
         touchCircle.y = initEndY;
         ensureBezierPoint();
@@ -174,7 +173,8 @@ public class BezierView2 extends View {
         invalidate();
     }
 
-    private boolean pointRange(float circleX, float circleY, float touchPointX, float touchPointY, float r) {
+    //判断点击点是否在圆的范围内
+    private boolean isBeyondCircle(float circleX, float circleY, float touchPointX, float touchPointY, float r) {
         if ((circleX - touchPointX) * (circleX - touchPointX) + (circleY - touchPointY) * (circleY - touchPointY) <= r * r) {
             return true;
         } else {
@@ -182,27 +182,26 @@ public class BezierView2 extends View {
         }
     }
 
-    private float distanceCircle(float touchX, float touchY) {
+    private float getDistance(float touchX, float touchY) {
         float distance = (touchX - fixedCircle.x) * (touchX - fixedCircle.x) + (touchY - fixedCircle.y) * (touchY - fixedCircle.y);
         return (float) Math.sqrt(distance);
     }
 
     private void ensureMiddlePoint() {
         //如果两个圆心的坐标距离小于小圆的半径,则贝塞尔曲线不显示
-        if (pointRange(fixedCircle.x, fixedCircle.y, touchCircle.x, touchCircle.y, fixedCircle.r)) {
-            middlePoint1.x = startPoint1.x;
-            middlePoint1.y = startPoint1.y;
-
-            middlePoint2.x = startPoint2.x;
-            middlePoint2.y = startPoint2.y;
+        if (isBeyondCircle(fixedCircle.x, fixedCircle.y, touchCircle.x, touchCircle.y, fixedCircle.r)) {
+            middlePoint1.x=middlePoint2.x = initEndX;
+            middlePoint1.y=middlePoint2.y = initEndY;
         } else {
-            //  取两个圆心的中点为控制点，而不是曲线的起始点和终点 ,此处仍然使用 middlePoint1，middlePoint2 进行
-            // 赋值，是为了以后两条曲线的控制点不相同做准备
+            //  取两个圆心的中点为控制点，而不是根据曲线的起始点和终点的来确定控制顶
             middlePoint1.x = middlePoint2.x = (fixedCircle.x + touchCircle.x) / 2;
             middlePoint1.y = middlePoint2.y = (fixedCircle.y + touchCircle.y) / 2;
         }
     }
 
+    /**
+     * 确定贝塞尔曲线的起止点坐标
+     */
     private void ensureBezierPoint() {
 
         float atan = (float) Math.atan((touchCircle.y - fixedCircle.y) / (touchCircle.x - fixedCircle.x)); //  求出的角度为需要角度的余角
@@ -225,10 +224,10 @@ public class BezierView2 extends View {
     }
 }
 
+// 贝塞尔曲线上的点
 class Point {
     float x;
     float y;
-
 }
 
 class Circle {
