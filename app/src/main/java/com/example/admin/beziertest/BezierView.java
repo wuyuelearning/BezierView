@@ -27,24 +27,24 @@ public class BezierView extends View {
     Paint paint;
 
     //  基准线
-    int baseLineStartX;
-    int baseLineStartY;
-    int baseLineEndX;
-    int baseLineEndY;
+    float baseLineStartX;
+    float baseLineStartY;
+    float baseLineEndX;
+    float baseLineEndY;
 
     //  View的宽度和高度
-    int viewWidth;
-    int viewHeight;
+    float viewWidth;
+    float viewHeight;
 
     //  控制点活动的范围 ， 以对角线确定出控制点的活动范围
-    int viewStartX;
-    int viewStartY;
-    int viewEndX;
-    int viewEndY;
+    float viewStartX;
+    float viewStartY;
+    float viewEndX;
+    float viewEndY;
 
     //  控制点初始位置
-    int initControlPointX;
-    int initControlPointY;
+    float initControlPointX;
+    float initControlPointY;
 
     Context context;
 
@@ -67,7 +67,7 @@ public class BezierView extends View {
 
     }
 
-//    public BezierView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+//    public BezierView(Context context, @Nullable AttributeSet attrs, float defStyleAttr, float defStyleRes) {
 //        super(context, attrs, defStyleAttr, defStyleRes);
 //    }
 
@@ -153,8 +153,8 @@ public class BezierView extends View {
      * @param event
      */
     private void ensureControlPoint(MotionEvent event) {
-        int touchX = (int) event.getX();
-        int touchY = (int) event.getY();
+        float touchX = (float) event.getX();
+        float touchY = (float) event.getY();
         if (touchY < viewStartY) {
             controlPoint.y = viewStartY;
             ensureControlPointX(touchX);
@@ -172,7 +172,7 @@ public class BezierView extends View {
      *
      * @param touchX
      */
-    private void ensureControlPointX(int touchX) {
+    private void ensureControlPointX(float touchX) {
         if (touchX < viewStartX) {
             controlPoint.x = viewStartX;
         } else if (viewStartX <= touchX && touchX <= viewEndX) {
@@ -186,6 +186,6 @@ public class BezierView extends View {
 
 // 控制点
 class ControlPoint {
-    int x;
-    int y;
+    float x;
+    float y;
 }
