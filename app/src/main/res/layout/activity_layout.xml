@@ -5,17 +5,17 @@
 
     <TextView
         android:id="@+id/text"
-        android:layout_width="100dp"
+        android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:text="bezier1"
+        android:text="bezierline"
         android:textSize="25dp"
         android:gravity="center"
         />
     <TextView
         android:id="@+id/text2"
-        android:layout_width="100dp"
+        android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:text="bezier2"
+        android:text="bezierBall"
         android:textSize="25dp"
         android:gravity="center"
         />
