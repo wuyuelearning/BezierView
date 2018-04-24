@@ -17,7 +17,7 @@ import android.view.View;
 
 public class BezierView2 extends View {
 
-    private String TAG = "tag";
+    private static final String TAG = "tag";
 
     Point startPoint1; //曲线1
     Point endPoint1;
@@ -83,7 +83,6 @@ public class BezierView2 extends View {
         path.quadTo(middlePoint1.x, middlePoint1.y, endPoint1.x, endPoint1.y);
         path.lineTo(endPoint2.x, endPoint2.y);   //  画笔画至(x,x)
 
-        path.moveTo(endPoint2.x, endPoint2.y);
         path.quadTo(middlePoint2.x, middlePoint2.y, startPoint2.x, startPoint2.y);
         path.lineTo(startPoint1.x, startPoint1.y);
 
@@ -164,10 +163,8 @@ public class BezierView2 extends View {
         float tempY = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                Log.d("TAG", "down");
                 break;
             case MotionEvent.ACTION_MOVE:
-                Log.d("TAG", "move");
                 motionMove(tempX, tempY);
                 break;
             case MotionEvent.ACTION_UP:
