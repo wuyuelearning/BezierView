@@ -2,6 +2,7 @@ package com.example.admin.beziertest;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.support.annotation.Nullable;
@@ -73,15 +74,28 @@ public class BezierView2 extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+
         ensureBezierPoint();
         path.reset();
-        path.moveTo(startPoint1.x, startPoint1.y);
+        //  六行代码 使画笔形的轨迹成封闭的图形，使得可以填充满颜色
+        // https://segmentfault.com/a/1190000000721127
+        path.moveTo(startPoint1.x, startPoint1.y);  //  画笔移动至(x,x),不画
         path.quadTo(middlePoint1.x, middlePoint1.y, endPoint1.x, endPoint1.y);
-        path.lineTo(endPoint1.x, endPoint1.y);
+        path.lineTo(endPoint2.x, endPoint2.y);   //  画笔画至(x,x)
 
-        path.moveTo(startPoint2.x, startPoint2.y);
-        path.quadTo(middlePoint2.x, middlePoint2.y, endPoint2.x, endPoint2.y);
-        path.lineTo(endPoint2.x, endPoint2.y);
+        path.moveTo(endPoint2.x, endPoint2.y);
+        path.quadTo(middlePoint2.x, middlePoint2.y, startPoint2.x, startPoint2.y);
+        path.lineTo(startPoint1.x, startPoint1.y);
+
+
+        //  原来的这部分代码 画笔的轨迹不是封闭的图形 ，则图像显示的是两条曲线
+//        path.moveTo(startPoint1.x, startPoint1.y);
+//        path.quadTo(middlePoint1.x, middlePoint1.y, endPoint1.x, endPoint1.y);
+//        path.lineTo(endPoint1.x, endPoint1.y);
+//
+//        path.moveTo(startPoint2.x, startPoint2.y);
+//        path.quadTo(middlePoint2.x, middlePoint2.y, endPoint2.x, endPoint2.y);
+//        path.lineTo(endPoint2.x, endPoint2.y);
 
         //  小圆消失后 贝塞尔曲线也消失
         if (isShowFixedCircle) {
@@ -134,11 +148,13 @@ public class BezierView2 extends View {
 
         path = new Path();
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setStyle(Paint.Style.STROKE);
+//        paint.setStyle(Paint.Style.FILL);
         paint.setAntiAlias(true);
+        paint.setColor(Color.rgb(0xaa, 0xee, 0xee));
 
         paintCircle = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintCircle.setStyle(Paint.Style.FILL);
+//        paintCircle.setStyle(Paint.Style.FILL);
+        paintCircle.setColor(Color.rgb(0xaa, 0xee, 0xee));
 
     }
 
